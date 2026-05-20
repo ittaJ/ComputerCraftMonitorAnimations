@@ -49,7 +49,7 @@ function Frame:addPixels(pixels)
 end
 
 function Frame:addText(text, colour, size, x, y, backgroundColour)
-    self.text = {text, colour, size, x, y}
+    self.text = {text, colour, size, x, y, backgroundColour}
 end
 
 Pixel = {}
