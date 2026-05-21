@@ -141,22 +141,40 @@ function startAdvancedAnimation(animation, monitorName)
         local text = animation.texts[1]
         local textString = text.text
         local stringLength = string.len(textString)
-        local backgroundColour = animation.frameBackgroundColour[1]
+        local backgroundColour = animation.frameBackgroundColours[1]
         local duration = animation.durations[1]
-        local previousString = ""
-        local numbers = string.rep("0", stringLength)
         local frame1 = Frame.new()
         frame1:setDuration(duration)
         frame1:setBackgroundColour(backgroundColour)
         frame1:addText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
 
-        previousString = numbers
-
         for i = 1, stringLength do
             local frameAnimation = Frame.new()
-            local newString = string.sub(previousString, i, stringLength)
+
+            local newString = ""
+
+            for j = 1, stringLength do
+                if j <= i then
+                    newString = newString .. string.sub(textString, j, j)
+                else
+                    newString = newString .. "0"
+                end
+            end
+
             print(newString)
 
+            frameAnimation:setDuration(duration)
+            frameAnimation:setBackgroundColour(backgroundColour)
+            frameAnimation:addText(
+                newString,
+                text.colour,
+                text.size,
+                text.x,
+                text.y,
+                text.backgroundColour
+            )
+
+            animation:addFrame(frameAnimation)
         end
 
     end
