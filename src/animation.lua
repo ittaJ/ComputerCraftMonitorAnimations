@@ -17,6 +17,60 @@ function Animation:setCustomColour(originalColour, colourCode, monitor)
     peripheral.wrap(monitor).setPaletteColour(originalColour, colourCode)
 end
 
+function Animation:setType(animationType)
+    self.type = animationType
+end
+
+AdvancedAnimation = {}
+AdvancedAnimation.__index = AdvancedAnimation
+AdvancedAnimation.inh = registerInh({ Animation })
+setmetatable(AdvancedAnimation, AdvancedAnimation.inh)
+
+AdvancedAnimationType = { CHANGE_TEXT = 1 }
+
+function searchInh(key, inh)
+    for i=1, #inh do
+        local found = inh[i][key]
+        if found then
+            return found
+        end
+    end
+end
+
+function registerInh(inh)
+    return {
+        __index = function(self, key)
+            return searchInh(key, inh)
+        end
+    }
+end
+
+function AdvancedAnimation.new(name)
+    local instance = setmetatable({}, AdvancedAnimation)
+    instance.name = name
+    instance.type = AdvancedAnimationType.CHANGE_TEXT
+    instance.texts = {}
+    instance.durations = {}
+    instance.frameBackgroundColours = {}
+    return instance
+end
+
+function AdvancedAnimation:setTexts(texts)
+    self.texts = texts
+end
+
+function AdvancedAnimation:setDurations(durations)
+    self.durations = durations
+end
+
+function AdvancedAnimation:setFrameBackgroundColours(colours)
+    self.frameBackgroundColours = colours
+end
+
+function AdvancedAnimation:setType(type)
+    instance.type = type
+end
+
 Frame = {}
 
 Frame.__index = Frame
@@ -68,6 +122,37 @@ function Pixel.new(x, y, colour)
     return instance
 end
 
+Text = {}
+
+Text.__index = Text
+
+function Text.new(text, colour, size, x, y, backgroundColour)
+    local instance = setmetatable({}, Text)
+    instance.text = text
+    instance.colour = colour
+    instance.size = size
+    instance.x = x
+    instance.y = y
+    instance.backgroundColour = backgroundColour
+    return instance
+end
+
+function startAdvancedAnimation(animation, monitorName)
+    if animation.type == AdvancedAnimationType.CHANGE_TEXT then
+
+        for _, text in ipairs(animation.texts) do
+            local frame = Frame.new()
+            frame:setDuration(animation.durations[_])
+            frame:setBackgroundColour(animation.frameBackgroundColours[_])
+            frame:writeText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
+            animation:addFrame(frame)
+        end
+
+        startAnimation(animation, monitorName)
+
+    end
+end
+
 function startAnimation(animation, monitorName)
     local frameIdx = 1
     local monitor = peripheral.wrap(monitorName)
@@ -101,22 +186,12 @@ function setMonitorToFrame(monitor, frame)
         end
 end
 
+--- create animation
 
-local zabkaMidAnimation = Animation.new("zabka_mid")
-local frame1ZabkaMid = Frame.new()
-local frame2ZabkaMid = Frame.new()
+local zabkaMidAnimation = AdvancedAnimation.new("zabka_mid")
+zabkaMidAnimation:setTexts({Text.new("Siema", colors.white, 3, 2, 2, colors.white),
+Text.new("Witaj!", colors.white, 3, 1, 5, colors.blue)})
+zabkaMidAnimation:setDurations({10, 5})
+zabkaMidAnimation:setBackgroundColours({colors.green, colors.blue})
 
-zabkaMidAnimation:setCustomColour(colors.green, 0x006D42, "monitor_0")
-
-frame1ZabkaMid:setDuration(10)
-frame1ZabkaMid:setBackgroundColour(colors.green)
-frame1ZabkaMid:addText("Zabka", colors.white, 3.5, 4, 4, colors.green)
-
-frame2ZabkaMid:setDuration(10)
-frame2ZabkaMid:setBackgroundColour(colors.green)
-frame2ZabkaMid:addText("Wpadaj do nas!", colors.white, 2, 4, 4, colors.green)
-
-zabkaMidAnimation:addFrame(frame1ZabkaMid)
-zabkaMidAnimation:addFrame(frame2ZabkaMid)
-
-startAnimation(zabkaMidAnimation, "monitor_0")
+startAdvancedAnimation(zabkaMidAnimation, "monitor_0")
