@@ -1,3 +1,20 @@
+function searchInh(key, inh)
+    for i=1, #inh do
+        local found = inh[i][key]
+        if found then
+            return found
+        end
+    end
+end
+
+function registerInh(inh)
+    return {
+        __index = function(self, key)
+            return searchInh(key, inh)
+        end
+    }
+end
+
 Animation = {}
 
 Animation.__index = Animation
@@ -27,23 +44,6 @@ AdvancedAnimation.inh = registerInh({ Animation })
 setmetatable(AdvancedAnimation, AdvancedAnimation.inh)
 
 AdvancedAnimationType = { CHANGE_TEXT = 1 }
-
-function searchInh(key, inh)
-    for i=1, #inh do
-        local found = inh[i][key]
-        if found then
-            return found
-        end
-    end
-end
-
-function registerInh(inh)
-    return {
-        __index = function(self, key)
-            return searchInh(key, inh)
-        end
-    }
-end
 
 function AdvancedAnimation.new(name)
     local instance = setmetatable({}, AdvancedAnimation)
