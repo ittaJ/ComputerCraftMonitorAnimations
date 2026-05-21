@@ -146,7 +146,7 @@ function startAdvancedAnimation(animation, monitorName)
         local frame1 = Frame.new()
         frame1:setDuration(duration)
         frame1:setBackgroundColour(backgroundColour)
-        frame1:addText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
+        frame1:addText(string.rep("0", stringLength), text.colour, text.size, text.x, text.y, text.backgroundColour)
         animation:addFrame(frame1)
 
         for i = 1, stringLength do
