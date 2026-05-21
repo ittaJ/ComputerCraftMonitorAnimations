@@ -25,7 +25,7 @@ AdvancedAnimation = {}
 AdvancedAnimation.__index = AdvancedAnimation
 setmetatable(AdvancedAnimation, { __index = Animation })
 
-AdvancedAnimationType = { CHANGE_TEXT = 1 }
+AdvancedAnimationType = { CHANGE_TEXT = 1, TEXT_SCROLL = 2, NUMBERS_TO_TEXT = 3 }
 
 function AdvancedAnimation.new(name)
     local self = Animation.new(name)
@@ -135,6 +135,31 @@ function startAdvancedAnimation(animation, monitorName)
         startAnimation(animation, monitorName)
 
     end
+
+    if animation.type == AdvancedAnimationType.NUMBERS_TO_TEXT then
+
+        local text = animation.texts[1]
+        local textString = text.text
+        local stringLength = string.len(textString)
+        local backgroundColour = animation.frameBackgroundColour[1]
+        local duration = animation.durations[1]
+        local previousString = ""
+        local numbers = string.rep("0", stringLength)
+        local frame1 = Frame.new()
+        frame1:setDuration(duration)
+        frame1:setBackgroundColour(backgroundColour)
+        frame1:addText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
+
+        previousString = numbers
+
+        for i = 1, stringLength do
+            local frameAnimation = Frame.new()
+            local newString = string.sub(previousString, i, stringLength)
+            print(newString)
+
+        end
+
+    end
 end
 
 function startAnimation(animation, monitorName)
@@ -147,6 +172,7 @@ function startAnimation(animation, monitorName)
         setMonitorToFrame(monitor, frame)
         frameIdx = math.max(1, (frameIdx + 1) % (#animation.frames + 1))
         sleep(frame:getDuration())
+
     end
 end
 
@@ -173,9 +199,9 @@ end
 --- create animation
 
 local zabkaMidAnimation = AdvancedAnimation.new("zabka_mid")
-zabkaMidAnimation:setTexts({Text.new("Siema", colors.white, 3, 2, 2, colors.white),
-Text.new("Witaj!", colors.white, 3, 1, 5, colors.blue)})
-zabkaMidAnimation:setDurations({10, 5})
-zabkaMidAnimation:setFrameBackgroundColours({colors.green, colors.blue})
+zabkaMidAnimation:setType(AdvancedAnimationType.NUMBERS_TO_TEXT)
+zabkaMidAnimation:setTexts({Text.new("Siema", colors.red, 1, 1, 1, colors.white)})
+zabkaMidAnimation:setDurations({5})
+zabkaMidAnimation:setFrameBackgroundColours({colors.black})
 
 startAdvancedAnimation(zabkaMidAnimation, "monitor_0")
