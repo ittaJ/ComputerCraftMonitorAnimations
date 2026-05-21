@@ -1,20 +1,3 @@
-function searchInh(key, inh)
-    for i=1, #inh do
-        local found = inh[i][key]
-        if found then
-            return found
-        end
-    end
-end
-
-function registerInh(inh)
-    return {
-        __index = function(self, key)
-            return searchInh(key, inh)
-        end
-    }
-end
-
 Animation = {}
 
 Animation.__index = Animation
@@ -40,19 +23,20 @@ end
 
 AdvancedAnimation = {}
 AdvancedAnimation.__index = AdvancedAnimation
-AdvancedAnimation.inh = registerInh({ Animation })
-setmetatable(AdvancedAnimation, AdvancedAnimation.inh)
+setmetatable(AdvancedAnimation, { __index = Animation })
 
 AdvancedAnimationType = { CHANGE_TEXT = 1 }
 
 function AdvancedAnimation.new(name)
-    local instance = setmetatable({}, AdvancedAnimation)
-    instance.name = name
-    instance.type = AdvancedAnimationType.CHANGE_TEXT
-    instance.texts = {}
-    instance.durations = {}
-    instance.frameBackgroundColours = {}
-    return instance
+    local self = Animation.new(name)
+    setmetatable(self, AdvancedAnimation)
+
+    self.type = AdvancedAnimationType.CHANGE_TEXT
+    self.texts = {}
+    self.durations = {}
+    self.frameBackgroundColours = {}
+
+    return self
 end
 
 function AdvancedAnimation:setTexts(texts)
@@ -68,7 +52,7 @@ function AdvancedAnimation:setFrameBackgroundColours(colours)
 end
 
 function AdvancedAnimation:setType(type)
-    instance.type = type
+    self.type = type
 end
 
 Frame = {}
@@ -140,11 +124,11 @@ end
 function startAdvancedAnimation(animation, monitorName)
     if animation.type == AdvancedAnimationType.CHANGE_TEXT then
 
-        for _, text in ipairs(animation.texts) do
+        for i, text in ipairs(animation.texts) do
             local frame = Frame.new()
-            frame:setDuration(animation.durations[_])
-            frame:setBackgroundColour(animation.frameBackgroundColours[_])
-            frame:writeText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
+            frame:setDuration(animation.durations[i])
+            frame:setBackgroundColour(animation.frameBackgroundColours[i])
+            frame:addText(text.text, text.colour, text.size, text.x, text.y, text.backgroundColour)
             animation:addFrame(frame)
         end
 
@@ -192,6 +176,6 @@ local zabkaMidAnimation = AdvancedAnimation.new("zabka_mid")
 zabkaMidAnimation:setTexts({Text.new("Siema", colors.white, 3, 2, 2, colors.white),
 Text.new("Witaj!", colors.white, 3, 1, 5, colors.blue)})
 zabkaMidAnimation:setDurations({10, 5})
-zabkaMidAnimation:setBackgroundColours({colors.green, colors.blue})
+zabkaMidAnimation:setFrameBackgroundColours({colors.green, colors.blue})
 
 startAdvancedAnimation(zabkaMidAnimation, "monitor_0")
