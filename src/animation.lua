@@ -92,7 +92,7 @@ function setMonitorToFrame(monitor, frame)
             paintutils.drawPixel(pixel.x, pixel.y, pixel.colour)
         end
 
-        if #frame.text > 0 then
+        if frame.text.text then
             monitor.setTextScale(frame.text.size)
             monitor.setTextColour(frame.text.colour)
             monitor.setBackgroundColour(frame.text.backgroundColour)
